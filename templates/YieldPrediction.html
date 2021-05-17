@@ -63,13 +63,14 @@
       </div>
 
       <section class="container">
-        <form>
+        <form action="{{ url_for('predict') }}" method="POST">
           <div class="form-group">
             <label for="season">Season</label>
             <select id="season" name="season" class="form-control">
               <option value="select an option">--Select an option--</option>
-              <option value="rabi">Rabi</option>
-              <option value="kharif">Kharif</option>
+              <option value="0">Kharif</option>
+              <option value="1">Rabi</option>
+              <option value="2">Whole Year</option>
             </select>
           </div>
           <div class="form-group">
@@ -78,6 +79,7 @@
               type="text"
               class="form-control"
               id="area"
+              name="area"
               placeholder="Enter area value"
             />
           </div>
@@ -87,6 +89,7 @@
               type="text"
               class="form-control"
               id="temperature"
+              name="temperature"
               placeholder="Enter temperature value"
             />
           </div>
@@ -96,6 +99,7 @@
               type="text"
               class="form-control"
               id="pH"
+              name="pH"
               placeholder="Enter pH value"
             />
           </div>
@@ -105,6 +109,7 @@
               type="text"
               class="form-control"
               id="rainfall"
+              name="rainfall"
               placeholder="Enter rainfall value"
             />
           </div>
@@ -114,6 +119,7 @@
               type="text"
               class="form-control"
               id="phosphorous"
+              name="phosphorous"
               placeholder="Enter phosphorous value"
             />
           </div>
@@ -123,6 +129,7 @@
               type="text"
               class="form-control"
               id="nitrogen"
+              name="nitrogen"
               placeholder="Enter nitrogen value"
             />
           </div>
@@ -132,6 +139,7 @@
               type="text"
               class="form-control"
               id="potassium"
+              name="potassium"
               placeholder="Enter potassium value"
             />
           </div>
@@ -140,42 +148,44 @@
             <label for="crop">Crop</label>
             <select id="crop" name="crop" class="form-control">
               <option value="select an option">--Select an option--</option>
-              <option value="arhar/tur">Arhar/Tur</option>
-              <option value="bajra">Bajra</option>
-              <option value="barley">Barley</option>
-              <option value="coriander">Coriander</option>
-              <option value="cotton(lint)">Cotton (Lint)</option>
-              <option value="cowpea(lobia)">Cowpea (Lobia)</option>
-              <option value="dry chillies">Dry Chillies</option>
-              <option value="garlic">Garlic</option>
-              <option value="ginger">Ginger</option>
-              <option value="gram">Gram</option>
-              <option value="groundnut">Groundnut</option>
-              <option value="jowar">Jowar</option>
-              <option value="linseed">Linseed</option>
-              <option value="maize-k">Maize-k</option>
-              <option value="maize-r">Maize-r</option>
-              <option value="masoor">Masoor</option>
-              <option value="moong(green gram)">Moong (Green Gram)</option>
-              <option value="onion">Onion</option>
-              <option value="peas & beans (pulses)">
-                Peas & Beans (Pulses)
-              </option>
-              <option value="potato">Potato</option>
-              <option value="ragi">Ragi</option>
-              <option value="rapeseed &mustard">Rapeseed & Mustard</option>
-              <option value="rice">Rice</option>
-              <option value="safflower">Safflower</option>
-              <option value="sugarcane">Sugarcane</option>
-              <option value="sunflower">Sunflower</option>
-              <option value="turmeric">Turmeric</option>
-              <option value="urad">Urad</option>
-              <option value="wheat">Wheat</option>
+              <option value="0">Arhar/Tur</option>
+              <option value="1">Bajra</option>
+              <option value="2">Barley</option>
+              <option value="3">Coriander</option>
+              <option value="4">Cotton (Lint)</option>
+              <option value="5">Cowpea (Lobia)</option>
+              <option value="6">Dry Chillies</option>
+              <option value="7">Garlic</option>
+              <option value="8">Ginger</option>
+              <option value="9">Gram</option>
+              <option value="10">Groundnut</option>
+              <option value="11">Jowar</option>
+              <option value="12">Linseed</option>
+              <option value="13">Maize-k</option>
+              <option value="14">Maize-r</option>
+              <option value="15">Masoor</option>
+              <option value="16">Moong (Green Gram)</option>
+              <option value="17">Onion</option>
+              <option value="18">Peas & Beans (Pulses)</option>
+              <option value="19">Potato</option>
+              <option value="20">Ragi</option>
+              <option value="21">Rapeseed & Mustard</option>
+              <option value="22">Rice</option>
+              <option value="23">Safflower</option>
+              <option value="24">Sugarcane</option>
+              <option value="25">Sunflower</option>
+              <option value="26">Turmeric</option>
+              <option value="27">Urad</option>
+              <option value="28">Wheat</option>
             </select>
           </div>
 
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-primary">Predict</button>
         </form>
+
+        <br />
+        <br />
+        {{ prediction_text }}
       </section>
     </div>
 
