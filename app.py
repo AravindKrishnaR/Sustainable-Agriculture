@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+from jinja2 import TemplateNotFound
 import numpy as np
 import pickle
 
@@ -6,10 +7,10 @@ import pickle
 app = Flask(__name__)
 model = pickle.load(open('Model.pkl', 'rb'))
 
-#default page of our web-app
-@app.route('/')
-def home():
-    return render_template('YieldPrediction.html')
+@app.route('/', defaults={'page': 'Home.html'})
+@app.route('/<page>')
+def html_lookup(page):
+    return render_template('{}'.format(page))
 
 #To use the predict button in our web-app
 @app.route('/predict',methods=['POST'])
