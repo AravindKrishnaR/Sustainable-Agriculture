@@ -2,10 +2,11 @@ from flask import Flask, render_template, request
 from jinja2 import TemplateNotFound
 import numpy as np
 import pickle
+from werkzeug.utils import secure_filename
 
 #Initialize the flask App
 app = Flask(__name__)
-model = pickle.load(open('Model.pkl', 'rb'))
+YieldPredictionModel = pickle.load(open('Model.pkl', 'rb'))
 
 @app.route('/', defaults = {'page': 'Home.html'})
 @app.route('/<page>')
@@ -27,9 +28,17 @@ def YieldPrediction():
        potassium = request.form.get("potassium")
        crop = request.form.get("crop")
     
-    prediction = model.predict([[season, area, temperature, pH, rainfall, phosphorous, nitrogen, potassium, crop]])
+    prediction = YieldPredictionModel.predict([[season, area, temperature, pH, rainfall, phosphorous, nitrogen, potassium, crop]])
 
     return render_template('YieldPrediction.html', prediction_text = 'The crop yield is: {}'.format(prediction))
 
+@app.route('/DiseaseDetection',methods = ['POST'])
+def DiseaseDetection():
+    if request.method == "POST":
+        file = request.files['image']
+        file_name = file.filename or ''
+        
+    return render_template('DiseaseDetection.html', prediction_text = 'The file name is: {}'.format(file_name))
+    
 if __name__ == "__main__":
     app.run(debug=True)
