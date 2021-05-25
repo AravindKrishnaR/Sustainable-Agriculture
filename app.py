@@ -10,6 +10,10 @@ import requests
 import json
 from Server.Models.crop_class import *
 from Server.Models.production_class import *
+from Server.Models.crop_disease_dict import crop_dict
+import tensorflow as tf
+import cv2
+import sys
 
 
 #Initialize the flask App
@@ -269,16 +273,33 @@ def CropRecommendation():
 
 
 
+####disease detection
 
+model=tf.keras.models.load_model("Server/Models/disease_predictor")
 
 @app.route('/DiseaseDetection',methods = ['POST'])
 def DiseaseDetection():
     if request.method == "POST":
-        file = request.files['image']
-        file_name = file.filename or ''
+        file = request.files['image'].read()
+
+        #convert string data to numpy array
+        npimg = np.fromstring(file, np.uint8)
+        # convert numpy array to image
+        img = cv2.imdecode(npimg, cv2.IMREAD_UNCHANGED)
+
+        img=cv2.resize(img,(150,150))
+        img=np.array([img])/255.
+        predictions = model.predict(img)
+        result=predictions.tolist()[0]
+        position=result.index(max(result))
+        disease=crop_dict(position) 
         
-    return render_template('DiseaseDetection.html', prediction_text = 'The file name is: {}'.format(file_name))
-    
+        
+    return render_template('DiseaseDetection.html', prediction_text = 'The file name is: {}'.format(disease)) 
+
+
+
+
 if __name__ == "__main__":
     f = open('dataset/ground_water_dic.pkl','rb')
     ground_water = pickle.load(f)
