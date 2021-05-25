@@ -14,7 +14,8 @@ from Server.Models.production_class import *
 
 #Initialize the flask App
 app = Flask(__name__)
-YieldPredictionModel = pickle.load(open('Model.pkl', 'rb'))
+YieldPredictionModel = pickle.load(open('Server/Models/YieldPredictionModel.pkl', 'rb'))
+FertilizerPredictionModel = pickle.load(open('Server/Models/FertilizerPredictionModel.pkl', 'rb'))
 
 
 @app.route('/', defaults = {'page': 'Home.html'})
@@ -23,10 +24,8 @@ def html_lookup(page):
     return render_template('{}'.format(page))
 
 
-
-
-#To use the predict button in our web-app
-@app.route('/YieldPrediction',methods = ['POST'])
+#Crop Yield Prediction
+@app.route('/YieldPrediction', methods = ['POST'])
 def YieldPrediction():
     
     if request.method == "POST":
@@ -42,8 +41,49 @@ def YieldPrediction():
     
     prediction = YieldPredictionModel.predict([[season, area, temperature, pH, rainfall, phosphorous, nitrogen, potassium, crop]])
 
-    return render_template('YieldPrediction.html', prediction_text = 'The crop yield is: {}'.format("hello"))
+    return render_template('YieldPrediction.html', prediction_text = 'The crop yield is: {}'.format(prediction))
 
+#Fertilizer Prediction
+@app.route('/FertilizerPrediction', methods = ['POST'])
+def FertilizerPrediction():
+    
+    if request.method == "POST":
+       temperature = request.form.get("temperature")
+       humidity = request.form.get("humidity")
+       moisture = request.form.get("moisture")
+       soil_type = request.form.get("soil_type")
+       crop_type = request.form.get("crop_type")
+       nitrogen = request.form.get("nitrogen")
+       potassium = request.form.get("potassium")
+       phosphorous = request.form.get("phosphorous")
+    
+    prediction = FertilizerPredictionModel.predict([[temperature, humidity, moisture, soil_type, crop_type, nitrogen, potassium, phosphorous]])
+
+    if prediction == 0:
+        fertilizer = "10-26-26"
+    elif prediction ==1:
+        fertilizer = "14-35-14"
+    elif prediction == 2:
+        fertilizer = "17-17-17"
+    elif prediction == 3:
+        fertilizer = "20-20"
+    elif prediction == 4:
+        fertilizer = "28-28"
+    elif prediction == 5:
+        fertilizer = "DAP"
+    else:
+        fertilizer = "Urea"
+
+    return render_template('FertilizerPrediction.html', prediction_text = 'The fertilizer to be used is: {}'.format(fertilizer))
+
+#Disease Detection
+@app.route('/DiseaseDetection', methods = ['POST'])
+def DiseaseDetection():
+    if request.method == "POST":
+        file = request.files['image']
+        file_name = file.filename or ''
+        
+    return render_template('DiseaseDetection.html', prediction_text = 'The file name is: {}'.format(file_name))
 
 
 #########crop recommendation #########
@@ -265,19 +305,6 @@ def CropRecommendation():
 
     return "crop_recommendation"
 
-
-
-
-
-
-
-@app.route('/DiseaseDetection',methods = ['POST'])
-def DiseaseDetection():
-    if request.method == "POST":
-        file = request.files['image']
-        file_name = file.filename or ''
-        
-    return render_template('DiseaseDetection.html', prediction_text = 'The file name is: {}'.format(file_name))
     
 if __name__ == "__main__":
     f = open('dataset/ground_water_dic.pkl','rb')
