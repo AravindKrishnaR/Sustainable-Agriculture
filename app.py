@@ -2,27 +2,20 @@ from flask import Flask, render_template, request
 from jinja2 import TemplateNotFound
 import numpy as np
 import pickle
-<<<<<<< HEAD
 from werkzeug.utils import secure_filename
-
-#Initialize the flask App
-app = Flask(__name__)
-YieldPredictionModel = pickle.load(open('Model.pkl', 'rb'))
-=======
 from flask import jsonify
 import joblib
 import csv
 import requests
 import json
-import pickle
 from Server.Models.crop_class import *
 from Server.Models.production_class import *
 
 
 #Initialize the flask App
 app = Flask(__name__)
-#model = pickle.load(open('Model.pkl', 'rb'))
->>>>>>> local-dev
+YieldPredictionModel = pickle.load(open('Model.pkl', 'rb'))
+
 
 @app.route('/', defaults = {'page': 'Home.html'})
 @app.route('/<page>')
