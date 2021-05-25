@@ -2,15 +2,27 @@ from flask import Flask, render_template, request
 from jinja2 import TemplateNotFound
 import numpy as np
 import pickle
+from flask import jsonify
+import joblib
+import csv
+import requests
+import json
+import pickle
+from Server.Models.crop_class import *
+from Server.Models.production_class import *
+
 
 #Initialize the flask App
 app = Flask(__name__)
-model = pickle.load(open('Model.pkl', 'rb'))
+#model = pickle.load(open('Model.pkl', 'rb'))
 
 @app.route('/', defaults = {'page': 'Home.html'})
 @app.route('/<page>')
 def html_lookup(page):
     return render_template('{}'.format(page))
+
+
+
 
 #To use the predict button in our web-app
 @app.route('/YieldPrediction',methods = ['POST'])
@@ -29,7 +41,242 @@ def YieldPrediction():
     
     prediction = model.predict([[season, area, temperature, pH, rainfall, phosphorous, nitrogen, potassium, crop]])
 
-    return render_template('YieldPrediction.html', prediction_text = 'The crop yield is: {}'.format(prediction))
+    return render_template('YieldPrediction.html', prediction_text = 'The crop yield is: {}'.format("hello"))
+
+
+
+#########crop recommendation #########
+
+scale_val = 0.1
+
+month_dict = {
+    'JAN': 0,
+    'FEB': 1,
+    'MAR': 2,
+    'APR': 3,
+    'MAY': 4,
+    'JUN': 5,
+    'JUL': 6,
+    'AUG': 7,
+    'SEP': 8,
+    'OCT': 9,
+    'NOV': 10,
+    'DEC': 11
+}
+
+
+def get_avg(temps, predict_month):
+    temp_arr = []
+    idx_num = month_dict[predict_month]
+    temp_arr.append(float(temps[idx_num]))
+    for i in range (0, 5, 1):
+        idx_num += 1
+        idx_num = idx_num % 12
+        temp_arr.append(float(temps[idx_num]))
+    return np.average(temp_arr, axis=0)
+
+def get_ground_water(ground_water, predict_month, district):
+    temp_arr=[]
+    gwater = list(ground_water[district].values())
+    idx_num = month_dict[predict_month]
+    temp_arr.append(gwater[idx_num])
+    for i in range(0, 5, 1):
+        idx_num += 1
+        idx_num = idx_num % 12
+        temp_arr.append(gwater[idx_num])
+    print("gwater:  ", temp_arr)
+    return np.average(temp_arr, axis=0)
+
+def get_soil(soil_type):
+    soil_arr=[]
+    if(soil_type == 'Alluvial'):
+        soil_arr.append(1)
+    else:
+        soil_arr.append(0)
+
+    if(soil_type == 'Black'):
+        soil_arr.append(1)
+    else:
+        soil_arr.append(0)
+
+    if(soil_type == 'Loam'):
+        soil_arr.append(1)
+    else:
+        soil_arr.append(0)
+
+    if(soil_type == 'Red'):
+        soil_arr.append(1)
+    else:
+        soil_arr.append(0)
+
+    return soil_arr
+        
+
+# AI/ML parameteres default
+nn_weight_path = 'Server/Models/weights/kharif_crops_final.pth'
+production_weight_path = 'Server/Models/weights/production_weights.sav'
+
+
+@app.route('/CropRecommendation',methods=['post'])
+def CropRecommendation():
+    area = request.form.get('area')
+    potassium = request.form.get('potassium')
+    nitrogen = request.form.get('nitrogen')
+    phosphorous = request.form.get('phosphorous')
+    ph = request.form.get('ph')
+    crop_season = request.form.get('crop_season')
+    current_crop = request.form.get('current_planted_crop')
+    predict_month = request.form.get('predict_month')
+    is_current = request.form.get('is_current')
+    soil_type = request.form.get('soil_type')
+
+    # Use this API for finding data using latitudes and Longitudes
+    # https://climateknowledgeportal.worldbank.org/api/data/get-download-data/projection/mavg/tas/rcp26/2020_2039/21.1458$cckp$79.0882/21.1458$cckp$79.0882
+    # temps stores the predicted temperature
+    latitude = str(request.form.get('lat'))
+    longitude = str(request.form.get('lng'))
+    district = (request.form.get('district')).upper()
+    state = (request.form.get('state')).upper()
+    
+    param = "tas"
+    URL = "https://climateknowledgeportal.worldbank.org/api/data/get-download-data/projection/mavg/"+ param +"/rcp26/2020_2039/" + \
+        latitude+"$cckp$"+longitude + "/"+latitude + "$cckp$"+longitude + ""
+    
+    
+    resp = requests.get(url=URL)
+    decoded = resp.content.decode("utf-8")
+    cr = csv.reader(decoded.splitlines(), delimiter=',')
+    my_list = list(cr)
+    temps = []
+    for index, row in enumerate(my_list):
+        if index == 0:
+            continue
+        if index > 13:
+            break
+        temps.append(row[0])
+
+    param = "pr"
+    resp = requests.get(url=URL)
+    decoded = resp.content.decode("utf-8")
+    cr = csv.reader(decoded.splitlines(), delimiter=',')
+    my_list = list(cr)
+    rainfall = []
+    for index, row in enumerate(my_list):
+        if index == 0:
+            continue
+        if index > 13:
+            break
+        rainfall.append(row[0])
+
+    # Getting the current temperature (if Current=true in Input)
+    current_weather_url = "http://api.openweathermap.org/data/2.5/weather?lat="+latitude +"&lon="+longitude +"&APPID=b9bb7acaa4566f8f7de584f90c2b12c2"
+    resp = requests.get(current_weather_url)
+    decoded = resp.content.decode("utf-8")
+    resp = json.loads(decoded)
+    current_temp = resp["main"]["temp"]
+    #print(current_temp)
+
+
+    # Do the prediction here using Classifier clf.
+    print(crop_season)
+    if(crop_season == 'Kharif'):
+        nn_weight_path = 'Server/Models/weights/kharif_crops_final.pth'
+    elif(crop_season == 'Rabi'):
+        nn_weight_path = 'Server/Models/weights/rabi_crops_final.pth'
+    elif(crop_season == 'Zaid'):
+        nn_weight_path = 'Server/Models/weights/zaid_crops_final.pth'
+    
+    production_weight_path = 'Server/Models/weights/production_weights.sav'
+
+    # get avg values
+    temp_avg = get_avg(temps, predict_month)
+    rain_avg = get_avg(rainfall, predict_month)
+
+    # gwater calculations
+    ground_water_avg = get_ground_water(ground_water, predict_month, district)
+    max_area_dist = int(max_area[district])
+    # print("gwater avg: {}  max_area_dist:  {}  area:  {}".format(type(ground_water_avg), type(max_area_dist), type(area)))
+    gwater_available = scale_val * (float(ground_water_avg) * float(area) ) / float(max_area_dist)
+    total_water = rain_avg + gwater_available
+
+    # sow_temp
+    if(is_current):
+        sow_temp = current_temp
+    else:
+        sow_temp = temps[month_dict[predict_month]]
+
+    # harvest temp
+    harvest_temp = temps[(month_dict[predict_month]+5)%12]
+
+    # soil paramteres
+    soil = get_soil(soil_type)
+
+    # Create parameter list
+    parameteres = [[temp_avg, ph, total_water, sow_temp, harvest_temp, nitrogen, potassium, phosphorous, soil[0], soil[1], soil[2], soil[3]]]
+
+    # create model instance
+    nn_model = crop_model(crop_season)
+    #load weights
+    nn_model.load_weights(nn_weight_path)
+    #get predictions
+    pred = nn_model.get_predictions(parameteres)
+    pred = pred.detach().numpy()
+
+    # get top_3 predictions
+    nn_model.get_top_n_predictions(pred, 3)
+
+    print(nn_model.max_pred_array)
+
+    # Crop Price Prediction
+    crop = [str(nn_model.max_pred_array[0][1]), str(nn_model.max_pred_array[1][1]), str(nn_model.max_pred_array[2][1])]
+    price_model = Production(crop, int(area), production_weight_path)
+
+    #calculate the production and price and also display
+    price_model.calculate_production_price() 
+
+    print(price_model.prod_arr)
+
+
+
+    # Making the response message
+    response = {
+        "predict": [
+            {
+                "crop": nn_model.max_pred_array[0][1],
+                "yield_percent": nn_model.max_pred_array[0][0],
+                "production": price_model.prod_arr[0][0],
+                "price": price_model.prod_arr[0][1]
+            },
+            {
+                "crop": nn_model.max_pred_array[1][1],
+                "yield_percent": nn_model.max_pred_array[1][0],
+                "production": price_model.prod_arr[1][0],
+                "price": price_model.prod_arr[1][1]
+            },
+            {
+                "crop": nn_model.max_pred_array[2][1],
+                "yield_percent": nn_model.max_pred_array[2][0],
+                "production": price_model.prod_arr[2][0],
+                "price": price_model.prod_arr[2][1]
+            }
+        ]
+    }
+
+    return "crop_recommendation"
+
+
+
+
+
+
 
 if __name__ == "__main__":
+    f = open('dataset/ground_water_dic.pkl','rb')
+    ground_water = pickle.load(f)
+    f.close()
+    
+    f = open('/max_area_groundwater.pkl','rb')
+    max_area = pickle.load(f)
+    f.close()
+    
     app.run(debug=True)
