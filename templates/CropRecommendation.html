@@ -73,13 +73,24 @@
       </div>
 
       <section class="container">
-        <form>
+        <form action="{{ url_for('CropRecommendation') }}" method="POST">
+          <div class="form-group">
+            <label for="pH">pH</label>
+            <input
+              type="text"
+              class="form-control"
+              id="pH"
+              name="pH"
+              placeholder="Enter pH value"
+            />
+          </div>
           <div class="form-group">
             <label for="nitrogen">Nitrogen</label>
             <input
               type="text"
               class="form-control"
               id="nitrogen"
+              name="nitrogen"
               placeholder="Enter nitrogen value"
             />
           </div>
@@ -89,6 +100,7 @@
               type="text"
               class="form-control"
               id="phosphorous"
+              name="phosphorous"
               placeholder="Enter phosphorous value"
             />
           </div>
@@ -98,48 +110,56 @@
               type="text"
               class="form-control"
               id="potassium"
+              name="potassium"
               placeholder="Enter potassium value"
             />
           </div>
           <div class="form-group">
-            <label for="temperature">Temperature</label>
+            <label for="oc">O C</label>
             <input
               type="text"
               class="form-control"
-              id="temperature"
-              placeholder="Enter temperature value"
+              id="oc"
+              name="oc"
+              placeholder="Enter oc value"
             />
           </div>
           <div class="form-group">
-            <label for="humidity">Humidity</label>
+            <label for="particles">Particles</label>
             <input
               type="text"
               class="form-control"
-              id="humidity"
-              placeholder="Enter humidity value"
+              id="particles"
+              name="particles"
+              placeholder="Enter particles value"
             />
           </div>
           <div class="form-group">
-            <label for="pH">pH</label>
+            <label for="waterholdingcontent">Water Holding Content</label>
             <input
               type="text"
               class="form-control"
-              id="pH"
-              placeholder="Enter pH value"
+              id="waterholdingcontent"
+              name="waterholdingcontent"
+              placeholder="Enter waterholdingcontent value"
             />
           </div>
           <div class="form-group">
-            <label for="rainfall">Rainfall</label>
-            <input
-              type="text"
-              class="form-control"
-              id="rainfall"
-              placeholder="Enter rainfall value"
-            />
+            <label for="soil_type">Soil Type</label>
+            <select id="soil_type" name="soil_type" class="form-control">
+              <option value="select an option">--Select an option--</option>
+              <option value="1">Clayey</option>
+              <option value="2">Sandy</option>
+              <option value="3">Loamy</option>
+            </select>
           </div>
 
           <button type="submit" class="btn btn-primary">Submit</button>
         </form>
+
+        <br />
+        <br />
+        <h3>{{ prediction_text }}</h3>
       </section>
     </div>
 
