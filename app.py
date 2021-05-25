@@ -169,11 +169,25 @@ def CropRecommendation():
     # Use this API for finding data using latitudes and Longitudes
     # https://climateknowledgeportal.worldbank.org/api/data/get-download-data/projection/mavg/tas/rcp26/2020_2039/21.1458$cckp$79.0882/21.1458$cckp$79.0882
     # temps stores the predicted temperature
-    latitude = str(request.form.get('lat'))
-    longitude = str(request.form.get('lng'))
+    # latitude = str(request.form.get('lat'))
+    # longitude = str(request.form.get('lng'))
+
+    pin_code=request.form.get('pin_code')
+    pin_code=str(pin_code)
     district = (request.form.get('district')).upper()
     state = (request.form.get('state')).upper()
+
+
+    URL="http://api.positionstack.com/v1/forward?access_key=0e76df9e3416fbe7863ea96d1b693b00&query="+pin_code+"%20"+district+"%20"+state
+    resp=requests.get(url=URL)
+
+    result_dict=resp.json()['data'][0]
+    latitude=result_dict['latitude']
+    longitude=result_dict['longitude']
+
+
     
+
     param = "tas"
     URL = "https://climateknowledgeportal.worldbank.org/api/data/get-download-data/projection/mavg/"+ param +"/rcp26/2020_2039/" + \
         latitude+"$cckp$"+longitude + "/"+latitude + "$cckp$"+longitude + ""
