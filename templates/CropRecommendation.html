@@ -19,13 +19,18 @@
       href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"
       rel="stylesheet"
     />
+    
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-    <title>Team N</title>
+    
+             
+    <title>SustAgro</title>
+    <link rel = "icon" href = "../static/images/logo.png" type = "image/x-icon">
 
     <link rel="stylesheet" href="../static/css/style.css" />
     <script src="../static/js/script.js"></script>
+    <script src="../static/js/state_district.js"></script>
   </head>
 
   <body>
@@ -111,7 +116,7 @@
               placeholder="Enter potassium value"
             />
           </div>
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label for="oc">O C</label>
             <input
               type="text"
@@ -120,8 +125,121 @@
               name="oc"
               placeholder="Enter oc value"
             />
-          </div>
-          <div class="form-group">
+            </div> -->
+
+            <div class="form-group">
+              <label for="area">Area</label>
+              <input
+                type="text"
+                class="form-control"
+                id="area"
+                name="area"
+                placeholder="Enter area value"
+              />
+              </div>
+
+              <div class="form-group">
+                <label for="crop_season">Crop Season</label>
+                <select id="crop_season" name="crop_season" class="form-control">
+                  <option value="select an option">--Select an option--</option>
+                  <option value="Kharif">Kharif</option>
+                  <option value="Rabi">Rabi</option>
+                  <option value="Zaid">Zaid</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="predict_month">predict month</label>
+                <select id="predict_month" name="predict_month" class="form-control">
+                  <option value="select an option">--Select an option--</option>
+                  <option value="JAN">January</option>
+                  <option value="FEB">February</option>
+                  <option value="MAR">March Nuts</option>
+                  <option value="APR">April</option>
+                  <option value="MAY">May</option>
+                  <option value="JUN">June</option>
+                  <option value="JUL">July</option>
+                  <option value="AUG">August</option>
+                  <option value="SEP">September</option>
+                  <option value="OCT">October</option>
+                  <option value="NOV">November</option>
+                  <option value="DEC">December</option>                  
+                </select>
+              </div>
+              <p>Are growing anything currently?</p>
+              <div class="form-check"> 
+                
+                <input
+                  type="radio"
+                  class="form-check-input"
+                  id="yes"
+                  name="is_current"
+                  
+                />
+                <label class="form-check-label for="yes">YES</label>
+              </div>
+              <div class="form-check"> 
+                
+                <input
+                type="radio"
+                class="form-check-input"
+                id="no"
+                name="is_current"
+                
+              />
+              <label class="form-check-labelfor="no">NO</label>
+                </div>
+
+                <div class="form-group">
+                  <label for="soil_type">Soil Type</label>
+                  <select id="soil_type" name="soil_type" class="form-control">
+                    <option value="select an option">--Select an option--</option>
+                    <option value="Alluvial">Alluvial</option>
+                    <option value="Black">Black</option>
+                    <option value="Loam">Loamy</option>
+                    <option value="Red">Red</option>
+        
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="pincode">Pin code</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="pin_code"
+                    name="pin_code"
+                    placeholder="Enter pincode"
+                  />
+                  </div>
+
+               <div class="form-group">
+              <label for="district">District</label>
+              <input
+                type="text"
+                class="form-control"
+                id="district"
+                name="district"
+                placeholder="Enter district"
+              />
+              </div>
+
+              <div class="form-group">
+              <label for="state">State</label>
+              <input
+                type="text"
+                class="form-control"
+                id="state"
+                name="state"
+                placeholder="Enter state"
+              />
+              </div>
+
+              
+                
+                  
+                  
+            
+          <!-- <div class="form-group">
             <label for="particles">Particles</label>
             <input
               type="text"
@@ -149,7 +267,7 @@
               <option value="2">Sandy</option>
               <option value="3">Loamy</option>
             </select>
-          </div>
+          </div> -->
 
           <button type="submit" class="btn btn-primary">Submit</button>
         </form>

@@ -20,7 +20,7 @@ import sys
 app = Flask(__name__)
 YieldPredictionModel = pickle.load(open('Server/Models/YieldPredictionModel.pkl', 'rb'))
 FertilizerPredictionModel = pickle.load(open('Server/Models/FertilizerPredictionModel.pkl', 'rb'))
-CropRecommendationModel = pickle.load(open('Server/Models/CropRecommendationModel.pkl', 'rb'))
+#CropRecommendationModel = pickle.load(open('Server/Models/CropRecommendationModel.pkl', 'rb'))
 
 @app.route('/', defaults = {'page': 'Home.html'})
 @app.route('/<page>')
@@ -81,7 +81,7 @@ def FertilizerPrediction():
     return render_template('FertilizerPrediction.html', prediction_text = 'The fertilizer to be used is: {}'.format(fertilizer))
 
 #Crop Recommendation
-@app.route('/CropRecommendation', methods = ['POST'])
+'''@app.route('/CropRecommendation', methods = ['POST'])
 def CropRecommendation():
     
     if request.method == "POST":
@@ -117,9 +117,9 @@ def CropRecommendation():
     elif prediction[0] == 10:
         crop = "Wheat"
 
-    return render_template('CropRecommendation.html', prediction_text = 'The recommended crop is: {}'.format(crop))
+    return render_template('CropRecommendation.html', prediction_text = 'The recommended crop is: {}'.format(crop))'''
 
-'''
+
 #########crop recommendation #########
 
 scale_val = 0.1
@@ -198,9 +198,9 @@ def CropRecommendation():
     potassium = request.form.get('potassium')
     nitrogen = request.form.get('nitrogen')
     phosphorous = request.form.get('phosphorous')
-    ph = request.form.get('ph')
+    ph = request.form.get('pH')
     crop_season = request.form.get('crop_season')
-    current_crop = request.form.get('current_planted_crop')
+    #current_crop = request.form.get('current_planted_crop')
     predict_month = request.form.get('predict_month')
     is_current = request.form.get('is_current')
     soil_type = request.form.get('soil_type')
@@ -208,8 +208,8 @@ def CropRecommendation():
     # Use this API for finding data using latitudes and Longitudes
     # https://climateknowledgeportal.worldbank.org/api/data/get-download-data/projection/mavg/tas/rcp26/2020_2039/21.1458$cckp$79.0882/21.1458$cckp$79.0882
     # temps stores the predicted temperature
-    #latitude = str(request.form.get('lat'))
-    #longitude = str(request.form.get('lng'))
+    # latitude = str(request.form.get('lat'))
+    # longitude = str(request.form.get('lng'))
     
     pin_code=str(request.form.get('pin_code'))
     district = (request.form.get('district')).upper()
@@ -228,10 +228,10 @@ def CropRecommendation():
 
     URL="http://api.positionstack.com/v1/forward?access_key=0e76df9e3416fbe7863ea96d1b693b00&query="+pin_code+"%20"+district+"%20"+state
     resp=requests.get(url=URL)
-
+    
     result_dict=resp.json()['data'][0]
-    latitude=result_dict['latitude']
-    longitude=result_dict['longitude']
+    latitude=str(result_dict['latitude'])
+    longitude=str(result_dict['longitude'])
 
 
     param = "tas"
@@ -288,12 +288,25 @@ def CropRecommendation():
     temp_avg = get_avg(temps, predict_month)
     rain_avg = get_avg(rainfall, predict_month)
 
+    f = open('dataset/ground_water_dic.pkl','rb')
+    ground_water = pickle.load(f)
+    f.close()
+        
+    f = open('dataset\max_area_groundwater.pkl','rb')
+    max_area = pickle.load(f)
+    f.close()
+
     # gwater calculations
     ground_water_avg = get_ground_water(ground_water, predict_month, district)
     max_area_dist = int(max_area[district])
     # print("gwater avg: {}  max_area_dist:  {}  area:  {}".format(type(ground_water_avg), type(max_area_dist), type(area)))
     gwater_available = scale_val * (float(ground_water_avg) * float(area) ) / float(max_area_dist)
     total_water = rain_avg + gwater_available
+
+    if(is_current=="yes"):
+        is_current=True
+    else:
+        is_curret=False
 
     # sow_temp
     if(is_current):
@@ -323,46 +336,46 @@ def CropRecommendation():
 
     print(nn_model.max_pred_array)
 
-    # Crop Price Prediction
-    crop = [str(nn_model.max_pred_array[0][1]), str(nn_model.max_pred_array[1][1]), str(nn_model.max_pred_array[2][1])]
-    price_model = Production(crop, int(area), production_weight_path)
+    # # Crop Price Prediction
+    # crop = [str(nn_model.max_pred_array[0][1]), str(nn_model.max_pred_array[1][1]), str(nn_model.max_pred_array[2][1])]
+    # price_model = Production(crop, int(area), production_weight_path)
 
-    #calculate the production and price and also display
-    price_model.calculate_production_price() 
+    # #calculate the production and price and also display
+    # price_model.calculate_production_price() 
 
-    print(price_model.prod_arr)
+    # print(price_model.prod_arr)
 
 
 
     # Making the response message
-    response = {
-        "predict": [
-            {
-                "crop": nn_model.max_pred_array[0][1],
-                "yield_percent": nn_model.max_pred_array[0][0],
-                "production": price_model.prod_arr[0][0],
-                "price": price_model.prod_arr[0][1]
-            },
-            {
-                "crop": nn_model.max_pred_array[1][1],
-                "yield_percent": nn_model.max_pred_array[1][0],
-                "production": price_model.prod_arr[1][0],
-                "price": price_model.prod_arr[1][1]
-            },
-            {
-                "crop": nn_model.max_pred_array[2][1],
-                "yield_percent": nn_model.max_pred_array[2][0],
-                "production": price_model.prod_arr[2][0],
-                "price": price_model.prod_arr[2][1]
-            }
-        ]
-    }
+    # response = {
+    #     "predict": [
+    #         {
+    #             "crop": nn_model.max_pred_array[0][1],
+    #             "yield_percent": nn_model.max_pred_array[0][0],
+    #             "production": price_model.prod_arr[0][0],
+    #             "price": price_model.prod_arr[0][1]
+    #         },
+    #         {
+    #             "crop": nn_model.max_pred_array[1][1],
+    #             "yield_percent": nn_model.max_pred_array[1][0],
+    #             "production": price_model.prod_arr[1][0],
+    #             "price": price_model.prod_arr[1][1]
+    #         },
+    #         {
+    #             "crop": nn_model.max_pred_array[2][1],
+    #             "yield_percent": nn_model.max_pred_array[2][0],
+    #             "production": price_model.prod_arr[2][0],
+    #             "price": price_model.prod_arr[2][1]
+    #         }
+    #     ]
+    # }
 
-    return "crop_recommendation"
+    return render_template('CropRecommendation.html', prediction_text = 'The recommended crop is: {} '.format(nn_model.max_pred_array[0][1]))
 
 
 
-'''
+
 
 ####disease detection
 
@@ -390,18 +403,10 @@ def DiseaseDetection():
 
 
 
-'''
-    
-if __name__ == "__main__":
-    f = open('dataset/ground_water_dic.pkl','rb')
-    ground_water = pickle.load(f)
-    f.close()
-    
-    f = open('/max_area_groundwater.pkl','rb')
-    max_area = pickle.load(f)
-    f.close()
-    
-    app.run(debug=True)'''
 
+    
 if __name__ == "__main__":
-    app.run()
+    
+    app.run(debug=True)
+
+
