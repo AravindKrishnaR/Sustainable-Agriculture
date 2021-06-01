@@ -292,7 +292,7 @@ def CropRecommendation():
     ground_water = pickle.load(f)
     f.close()
         
-    f = open('dataset\max_area_groundwater.pkl','rb')
+    f = open('dataset/max_area_groundwater.pkl','rb')
     max_area = pickle.load(f)
     f.close()
 
@@ -407,6 +407,4 @@ def DiseaseDetection():
     
 if __name__ == "__main__":
     
-    app.run(debug=True)
-
-
+    app.run()
