@@ -48,19 +48,19 @@ class crop_model(nn.Module):
         self.season = season
 
         if(season == 'Kharif'):
-            df = pd.read_csv('Models/dataset_for_nn/kharif_all_crops.csv')
+            df = pd.read_csv('Server/Models/dataset_for_nn/kharif_all_crops.csv')
 
             self.input = nn.Linear(k_input_nodes, k_hidden1_nodes)
             self.hidden1 = nn.Linear(k_hidden1_nodes, k_hidden2_nodes)
             self.hidden2 = nn.Linear(k_hidden2_nodes, k_output_nodes)
         if(season == 'Rabi'):
 
-            df = pd.read_csv('Models/dataset_for_nn/rabi_crops.csv')
+            df = pd.read_csv('Server/Models/dataset_for_nn/rabi_crops.csv')
             self.input = nn.Linear(r_input_nodes, r_hidden1_nodes)
             self.hidden1 = nn.Linear(r_hidden1_nodes, r_hidden2_nodes)
             self.hidden2 = nn.Linear(r_hidden2_nodes, r_output_nodes)
         if(season == 'Zaid'):
-            df = pd.read_csv('Models/dataset_for_nn/zaid_crops.csv')
+            df = pd.read_csv('Server/Models/dataset_for_nn/zaid_crops.csv')
             self.input = nn.Linear(z_input_nodes, z_hidden1_nodes)
             self.hidden1 = nn.Linear(z_hidden1_nodes, z_hidden2_nodes)
             self.hidden2 = nn.Linear(z_hidden2_nodes, z_output_nodes)
