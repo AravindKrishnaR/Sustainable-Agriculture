@@ -211,11 +211,7 @@ def CropRecommendation():
     # latitude = str(request.form.get('lat'))
     # longitude = str(request.form.get('lng'))
     
-    pin_code=str(request.form.get('pin_code'))
-    district = (request.form.get('district')).upper()
-    state = (request.form.get('state')).upper()
-    URL="http://api.positionstack.com/v1/forward?access_key=0e76df9e3416fbe7863ea96d1b693b00&query="+pin_code+"%20"+district+"%20"+state
-    resp=requests.get(url=URL)
+   
 
     # latitude = str(request.form.get('lat'))
     # longitude = str(request.form.get('lng'))
@@ -237,8 +233,7 @@ def CropRecommendation():
     param = "tas"
     URL = "https://climateknowledgeportal.worldbank.org/api/data/get-download-data/projection/mavg/"+ param +"/rcp26/2020_2039/" + \
         latitude+"$cckp$"+longitude + "/"+latitude + "$cckp$"+longitude + ""
-    
-    
+        
     resp = requests.get(url=URL)
     decoded = resp.content.decode("utf-8")
     cr = csv.reader(decoded.splitlines(), delimiter=',')
@@ -401,10 +396,6 @@ def DiseaseDetection():
         
     return render_template('DiseaseDetection.html', prediction_text = 'The disease is found out to be: {}'.format(disease)) 
 
-
-
-
-    
 if __name__ == "__main__":
     
     app.run()
