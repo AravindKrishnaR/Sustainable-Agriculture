@@ -45,7 +45,7 @@ def YieldPrediction():
     
     prediction = YieldPredictionModel.predict([[season, area, temperature, pH, rainfall, phosphorous, nitrogen, potassium, crop]])
 
-    return render_template('YieldPrediction.html', production = 'The production is expected to be : {} kilograms per hectare'.format(prediction[0]))
+    return render_template('YieldPrediction.html', prediction_text = 'The crop yield is: {}'.format(prediction[0]))
 
 #Fertilizer Prediction
 @app.route('/FertilizerPrediction', methods = ['POST'])
@@ -78,9 +78,49 @@ def FertilizerPrediction():
     else:
         fertilizer = "Urea"
 
-    return render_template('FertilizerPrediction.html', fertilizer = 'The fertilizer to be used is : {}'.format(fertilizer))
+    return render_template('FertilizerPrediction.html', prediction_text = 'The fertilizer to be used is: {}'.format(fertilizer))
 
 #Crop Recommendation
+'''@app.route('/CropRecommendation', methods = ['POST'])
+def CropRecommendation():
+    
+    if request.method == "POST":
+       pH = request.form.get("pH")
+       nitrogen = request.form.get("nitrogen")
+       phosphorous = request.form.get("phosphorous")
+       potassium = request.form.get("potassium")
+       oc = request.form.get("oc")
+       particles = request.form.get("particles")
+       waterholdingcontent = request.form.get("waterholdingcontent")
+       soil_type = request.form.get("soil_type")
+    
+    prediction = CropRecommendationModel.predict([[pH, nitrogen, phosphorous, potassium, oc, particles, waterholdingcontent, soil_type]])
+    
+    if prediction[0] == 1:
+        crop = "Carrot"
+    elif prediction[0] == 2:
+        crop = "Coconut"
+    elif prediction[0] == 3:
+        crop = "Cotton"
+    elif prediction[0] == 4:
+        crop = "Groundnut"
+    elif prediction[0] == 5:
+        crop = "Melon"
+    elif prediction[0] ==6:
+        crop = "Millet"
+    elif prediction[0] == 7:
+        crop = "Potato"
+    elif prediction[0] == 8:
+        crop = "Rice"
+    elif prediction[0] == 9:
+        crop = "Vegetable"
+    elif prediction[0] == 10:
+        crop = "Wheat"
+
+    return render_template('CropRecommendation.html', prediction_text = 'The recommended crop is: {}'.format(crop))'''
+
+
+#########crop recommendation #########
 
 scale_val = 0.1
 
@@ -165,12 +205,22 @@ def CropRecommendation():
     is_current = request.form.get('is_current')
     soil_type = request.form.get('soil_type')
 
+    # Use this API for finding data using latitudes and Longitudes
+    # https://climateknowledgeportal.worldbank.org/api/data/get-download-data/projection/mavg/tas/rcp26/2020_2039/21.1458$cckp$79.0882/21.1458$cckp$79.0882
+    # temps stores the predicted temperature
+    # latitude = str(request.form.get('lat'))
+    # longitude = str(request.form.get('lng'))
+    
+   
+
+    # latitude = str(request.form.get('lat'))
+    # longitude = str(request.form.get('lng'))
+
     pin_code=request.form.get('pin_code')
     pin_code=str(pin_code)
     district = (request.form.get('district')).upper()
     state = (request.form.get('state')).upper()
 
-    # Using API to find latitude and longitude
 
     URL="http://api.positionstack.com/v1/forward?access_key=0e76df9e3416fbe7863ea96d1b693b00&query="+pin_code+"%20"+district+"%20"+state
     resp=requests.get(url=URL)
@@ -316,9 +366,7 @@ def CropRecommendation():
     #     ]
     # }
 
-    return render_template('CropRecommendation.html', crop1 = format(nn_model.max_pred_array[0][1]), yield1 = format(nn_model.max_pred_array[0][0]), 
-    crop2 = format(nn_model.max_pred_array[1][1]), yield2 = format(nn_model.max_pred_array[1][0]), 
-    crop3 = format(nn_model.max_pred_array[2][1]), yield3 = format(nn_model.max_pred_array[2][0]))
+    return render_template('CropRecommendation.html', prediction_text = 'The recommended crop is: {} '.format(nn_model.max_pred_array[0][1]))
 
 
 
@@ -346,7 +394,7 @@ def DiseaseDetection():
         disease=crop_dict(position) 
         
         
-    return render_template('DiseaseDetection.html', disease = 'The detected disease : {}'.format(disease)) 
+    return render_template('DiseaseDetection.html', prediction_text = 'The disease is found out to be: {}'.format(disease)) 
 
 if __name__ == "__main__":
     
