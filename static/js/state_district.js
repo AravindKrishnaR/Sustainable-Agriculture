@@ -157,6 +157,6 @@ $("#inputState").change(function(){
   for(var i = 0; i < optionsList.length; i++){
     htmlString = htmlString+"<option value='"+ optionsList[i] +"'>"+ optionsList[i] +"</option>";
   }
-  $("#inputDistrict").html(htmlString);
+  $("#district").html(htmlString);
 
 });

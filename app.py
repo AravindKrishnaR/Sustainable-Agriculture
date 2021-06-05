@@ -154,10 +154,21 @@ production_weight_path = 'Server/Models/weights/production_weights.sav'
 
 @app.route('/CropRecommendation',methods=['post'])
 def CropRecommendation():
+
+    URL="http://127.0.0.1:1880/sensors"
+    resp=requests.post(url=URL)
+    resp=resp.json()
+    potassium=resp['potassium']
+    nitrogen=resp['nitrogen']
+    phosphorous=resp['phosphorous']
+    
+
+    
+
     area = request.form.get('area')
-    potassium = request.form.get('potassium')
-    nitrogen = request.form.get('nitrogen')
-    phosphorous = request.form.get('phosphorous')
+    # potassium = request.form.get('potassium')
+    # nitrogen = request.form.get('nitrogen')
+    # phosphorous = request.form.get('phosphorous')
     ph = request.form.get('pH')
     crop_season = request.form.get('crop_season')
     #current_crop = request.form.get('current_planted_crop')
@@ -344,9 +355,10 @@ def DiseaseDetection():
         result=predictions.tolist()[0]
         position=result.index(max(result))
         disease=crop_dict(position) 
+        dict=disease.split("_")
+        dict=[i  for i in dict if i!=""]
         
-        
-    return render_template('DiseaseDetection.html', disease = 'The detected disease : {}'.format(disease)) 
+    return render_template('DiseaseDetection.html', disease = "Plant :{},  health  status: {}".format(dict[0]," ".join(dict[1:]))) 
 
 if __name__ == "__main__":
     
