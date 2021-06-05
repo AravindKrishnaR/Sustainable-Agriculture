@@ -1,0 +1,157 @@
+[
+    {
+        "id": "7ef25e48.9103d",
+        "type": "tab",
+        "label": "Sensors",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "5acdc5d2.eb648c",
+        "type": "http in",
+        "z": "7ef25e48.9103d",
+        "name": "",
+        "url": "/sensors",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 800,
+        "y": 260,
+        "wires": [
+            [
+                "9a9a6420.239ea8",
+                "25edcee2.d90132",
+                "e9a6b4ad.b8dd08",
+                "69d48917.7f7648"
+            ]
+        ]
+    },
+    {
+        "id": "cf88f7d7.9f7388",
+        "type": "http response",
+        "z": "7ef25e48.9103d",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1410,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "9a9a6420.239ea8",
+        "type": "function",
+        "z": "7ef25e48.9103d",
+        "name": "Nitrogen sensor",
+        "func": "var nitrogen=Math.floor(Math.random()*20+10);\n\nmsg.payload={\"nitrogen\":nitrogen};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1040,
+        "y": 200,
+        "wires": [
+            [
+                "ebea284f.567e08"
+            ]
+        ]
+    },
+    {
+        "id": "25edcee2.d90132",
+        "type": "function",
+        "z": "7ef25e48.9103d",
+        "name": "Phosphorous sensor",
+        "func": "var phosphorous=Math.floor(Math.random()*30+10);\n\n\nmsg.payload={\"phosphorous\":phosphorous};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1060,
+        "y": 300,
+        "wires": [
+            [
+                "ebea284f.567e08"
+            ]
+        ]
+    },
+    {
+        "id": "e9a6b4ad.b8dd08",
+        "type": "function",
+        "z": "7ef25e48.9103d",
+        "name": "Potaassium sensor",
+        "func": "var potassium=Math.floor(Math.random()*40+10);\n\nmsg.payload={\"potassium\":potassium};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1050,
+        "y": 360,
+        "wires": [
+            [
+                "ebea284f.567e08"
+            ]
+        ]
+    },
+    {
+        "id": "ebea284f.567e08",
+        "type": "join",
+        "z": "7ef25e48.9103d",
+        "name": "",
+        "mode": "custom",
+        "build": "merged",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "4",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 1270,
+        "y": 260,
+        "wires": [
+            [
+                "cf88f7d7.9f7388",
+                "248a4ae6.d20c96"
+            ]
+        ]
+    },
+    {
+        "id": "248a4ae6.d20c96",
+        "type": "debug",
+        "z": "7ef25e48.9103d",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1440,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "69d48917.7f7648",
+        "type": "function",
+        "z": "7ef25e48.9103d",
+        "name": "pH sensor",
+        "func": "var pH=Math.floor(Math.random()*13+1);\n\nmsg.payload={\"pH\":pH};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1020,
+        "y": 140,
+        "wires": [
+            [
+                "ebea284f.567e08"
+            ]
+        ]
+    }
+]
