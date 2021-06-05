@@ -33,15 +33,24 @@ def html_lookup(page):
 def YieldPrediction():
     
     if request.method == "POST":
-       season = request.form.get("season")
-       area = request.form.get("area")
-       temperature = request.form.get("temperature")
-       pH = request.form.get("pH")
-       rainfall = request.form.get("rainfall")
-       phosphorous = request.form.get("phosphorous")
-       nitrogen = request.form.get("nitrogen")
-       potassium = request.form.get("potassium")
-       crop = request.form.get("crop")
+
+        URL="http://127.0.0.1:1880/sensors"
+        resp=requests.post(url=URL)
+        resp=resp.json()
+        potassium=resp['potassium']
+        nitrogen=resp['nitrogen']
+        phosphorous=resp['phosphorous']
+        pH=resp['pH']
+
+        season = request.form.get("season")
+        area = request.form.get("area")
+        temperature = request.form.get("temperature")
+        rainfall = request.form.get("rainfall")
+        # pH = request.form.get("pH")
+        # phosphorous = request.form.get("phosphorous")
+        # nitrogen = request.form.get("nitrogen")
+        # potassium = request.form.get("potassium")
+        crop = request.form.get("crop")
     
     prediction = YieldPredictionModel.predict([[season, area, temperature, pH, rainfall, phosphorous, nitrogen, potassium, crop]])
 
@@ -52,14 +61,22 @@ def YieldPrediction():
 def FertilizerPrediction():
     
     if request.method == "POST":
-       temperature = request.form.get("temperature")
-       humidity = request.form.get("humidity")
-       moisture = request.form.get("moisture")
-       soil_type = request.form.get("soil_type")
-       crop_type = request.form.get("crop_type")
-       nitrogen = request.form.get("nitrogen")
-       potassium = request.form.get("potassium")
-       phosphorous = request.form.get("phosphorous")
+
+        URL="http://127.0.0.1:1880/sensors"
+        resp=requests.post(url=URL)
+        resp=resp.json()
+        potassium=resp['potassium']
+        nitrogen=resp['nitrogen']
+        phosphorous=resp['phosphorous']
+            
+        temperature = request.form.get("temperature")
+        humidity = request.form.get("humidity")
+        moisture = request.form.get("moisture")
+        soil_type = request.form.get("soil_type")
+        crop_type = request.form.get("crop_type")
+        # nitrogen = request.form.get("nitrogen")
+        # potassium = request.form.get("potassium")
+        # phosphorous = request.form.get("phosphorous")
     
     prediction = FertilizerPredictionModel.predict([[temperature, humidity, moisture, soil_type, crop_type, nitrogen, potassium, phosphorous]])
 
@@ -161,17 +178,16 @@ def CropRecommendation():
     potassium=resp['potassium']
     nitrogen=resp['nitrogen']
     phosphorous=resp['phosphorous']
-    
-
-    
+    ph=resp['pH']
+       
 
     area = request.form.get('area')
     # potassium = request.form.get('potassium')
     # nitrogen = request.form.get('nitrogen')
     # phosphorous = request.form.get('phosphorous')
-    ph = request.form.get('pH')
-    crop_season = request.form.get('crop_season')
+    # ph = request.form.get('pH')
     #current_crop = request.form.get('current_planted_crop')
+    crop_season = request.form.get('crop_season')
     predict_month = request.form.get('predict_month')
     is_current = request.form.get('is_current')
     soil_type = request.form.get('soil_type')
@@ -358,7 +374,7 @@ def DiseaseDetection():
         dict=disease.split("_")
         dict=[i  for i in dict if i!=""]
         
-    return render_template('DiseaseDetection.html', disease = "Plant :{},  health  status: {}".format(dict[0]," ".join(dict[1:]))) 
+    return render_template('DiseaseDetection.html', disease = "Plant : {}, \n Health  status: {}".format(dict[0]," ".join(dict[1:]))) 
 
 if __name__ == "__main__":
     
