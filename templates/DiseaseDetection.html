@@ -84,6 +84,7 @@
               name="image"
               multiple
               accept="image/*"
+              onchange="getImage(this)"
             />
           </div>
 
@@ -91,7 +92,7 @@
         </form>
 
         <br />
-
+        <img id="showImage" />
         <div class="container" id="output">
           <div class="row col-md-10 col-md-offset-2 custyle">
             <h5>
@@ -175,5 +176,36 @@
         </div>
       </div>
     </section>
+    <script>
+      const showImage = (toShow) => {
+        let image = localStorage.getItem("image");
+        let imgId = document.getElementById("showImage");
+        let result = document.querySelector(".custyle");
+        if (image) {
+          imgId.src = image;
+        } else {
+          result.style.display = "none";
+        }
+        if (result && toShow) {
+          result.style.display = "none";
+        }
+      };
+      showImage();
+      const toBase64 = (file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (error) => reject(error);
+        });
+      async function getImage(event) {
+        localStorage.removeItem("image");
+        console.log(event.files[0]);
+        let file = event.files[0];
+        let base64Src = await toBase64(file);
+        localStorage.setItem("image", base64Src);
+        showImage(true);
+      }
+    </script>
   </body>
 </html>
